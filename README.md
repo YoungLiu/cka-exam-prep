@@ -42,6 +42,39 @@
     > 1. the language is more expressive (not just “AND of exact match”)
     > 2. you can indicate that the rule is “soft”/”preference” rather than a hard requirement, so if the scheduler can’t satisfy it, the pod will still be scheduled
     > 3. you can constrain against labels on other pods running on the node (or other topological domain), rather than against labels on the node itself, which allows rules about which pods can and cannot be co-located
+    > 4. If you specify multiple nodeSelectorTerms associated with nodeAffinity types, then the pod can be scheduled onto a node if one of the nodeSelectorTerms is satisfied.
+    > 5. If you specify both nodeSelector and nodeAffinity, both must be satisfied for the pod to be scheduled onto a candidate node.
+    > 6. If you specify multiple matchExpressions associated with nodeSelectorTerms, then the pod can be scheduled onto a node only if all matchExpressions can be satisfied.
+
+    > example:
+    > ```yaml
+    > apiVersion: v1
+    > kind: Pod
+    > metadata:
+    >   name: with-node-affinity
+    >   spec:
+    >   affinity:
+    >     nodeAffinity:
+    >       requiredDuringSchedulingIgnoredDuringExecution:
+    >         nodeSelectorTerms:
+    >         - matchExpressions:
+    >           - key: kubernetes.io/e2e-az-name
+    >             operator: In
+    >             values:
+    >             - e2e-az1
+    >             - e2e-az2
+    >       preferredDuringSchedulingIgnoredDuringExecution:
+    >       - weight: 1
+    >         preference:
+    >           matchExpressions:
+    >           - key: another-node-label-key
+    >             operator: In
+    >             values:
+    >             - another-node-label-value
+    >   containers:
+    >   - name: with-node-affinity
+    >     image: k8s.gcr.io/pause:2.0
+    > ```
 
     * [Node affinity (beta feature)](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#node-affinity-beta-feature)
 
