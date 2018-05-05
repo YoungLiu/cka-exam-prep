@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: test-daemonset
+  namespace: test-namespace
+  labels:
+    k8s-app: test-daemonset
+spec:
+  selector:
+    matchLabels:
+      name: test-daemonset
+  template:
+    metadata:
+      labels:
+        name: test-daemonset
+    spec:
+      tolerations:
+      - key: node-role.kubernetes.io/master
+        effect: NoSchedule
+      containers:
+      - name: google-pause
+        image: k8s.gcr.io/pause:2.0
